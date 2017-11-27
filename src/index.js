@@ -6,6 +6,7 @@ const cfonts = require('cfonts');
 const Table = require('cli-table2');
 const colors = require('colors');
 const humanize = require('humanize-plus');
+const blessed = require('blessed');
 
 const list = val => val.split(',')
 
@@ -27,40 +28,50 @@ const find = program.find;
 const top = !isNaN(program.top) && +program.top > 0 ? +program.top : find.length > 0 ? 1500 : 10;
 const humanizeIsEnabled = program.humanize !== 'false';
 
+var screen = blessed.screen({
+  smartCSR: true,
+  fullUnicode: true,
+});
+
+screen.title = 'Coinmon Cryptocurrency Tracker';
+var screen = blessed.screen({
+  smartCSR: true,
+  fullUnicode: true,
+  resizeTimeout: 300,
+ dockBorders: true,
+ cursor: {
+   artificial: true,
+   shape: 'line',
+   blink: true,
+   color: null
+ },
+});
+
+const container = blessed.box({
+  parent: screen,
+  scrollable: true,
+  left: 'center',
+  top: 'center',
+  width: '100%',
+  height: '100%',
+  content: '{center}Welcome to Coinmon: \n The Cryptocurrency Price Tool on CLI \n To Refresh Click on The Terminal, Scroll Use the Arrow Keys ↑↓,\n Quit on Escape, q, or Control-C.{/center}',
+  tags: true,
+  style: {
+    fg: 'white',
+    bg: 'black'
+  },
+  border: 'line',
+  keys: true,
+  vi: true,
+  alwaysScroll: true,
+  scrollbar: {
+    ch: ' ',
+    inverse: true
+  }
+});
+
 const coinmonStart = () => {
-  const table = new Table({
-    chars: {
-      'top': '-',
-      'top-mid': '-',
-      'top-left': '-',
-      'top-right': '-',
-      'bottom': '-',
-      'bottom-mid': '-',
-      'bottom-left': '-',
-      'bottom-right': '-',
-      'left': '║',
-      'left-mid': '-',
-      'mid': '-',
-      'mid-mid': '-',
-      'right': '║',
-      'right-mid': '-',
-      'middle': '│'
-    },
-    head: ['Rank', 'Coin', `Price (${convert})`, 'Change (24H)', 'Change (1H)', `Market Cap (${convert})`].map(title => title.yellow),
-    colWidths: [6, 14, 15, 15, 15, 20]
-  });
-
-  cfonts.say('coinmon', {
-    font: 'simple3d',
-    align: 'left',
-    colors: ['yellow'],
-    background: 'Black',
-    letterSpacing: 2,
-    lineHeight: 1,
-    space: true,
-    maxLength: '0'
-  });
-
+  const tables = [['Rank', 'Coin', `Price (${convert})`, 'Change (24H)', 'Change (1H)', `Market Cap (${convert})`]];
   const spinner = ora('Loading data').start();
   const sourceUrl = `https://api.coinmarketcap.com/v1/ticker/?limit=${top}&convert=${convert}`;
   axios.get(sourceUrl).then(function (response) {
@@ -79,23 +90,50 @@ const coinmonStart = () => {
       const change1h = percentChange1h ? percentChange1h > 0 ? textChange1h.green : textChange1h.red : 'NA';
       const marketCap = record[`market_cap_${convert}`.toLowerCase()];
       const displayedMarketCap = humanizeIsEnabled ? humanize.compactInteger(marketCap, 3) : marketCap;
-      return [record.rank, `💰  ${record.symbol}`, record[`price_${convert}`.toLowerCase()], change24h, change1h, displayedMarketCap];
-    }).forEach(record => table.push(record));
+      return [record.rank, `${record.symbol}`, record[`price_${convert}`.toLowerCase()], change24h, change1h, displayedMarketCap];
+    }).forEach(record => tables.push(record));
+
+    const table = blessed.ListTable({
+      parent: container,
+      border: "line",
+      top: 4,
+      tags: true,
+      width: '98%',
+      height: '98%',
+      style: {
+        border: {
+          fg: "red"
+        },
+        header: {
+          fg: "yellow",
+          bold: true
+        },
+        cell: {
+          fg: "black"
+        }
+      }
+    });
     if (table.length === 0) {
       console.log('We are not able to find coins matching your keywords'.red);
     } else {
+      table.setData(tables);
+      container.append(table);
       console.log(`Data source from coinmarketcap.com at ${new Date().toLocaleTimeString()}`);
-      console.log(table.toString());
+      screen.render();
+
     }
   }).catch(function (error) {
-    spinner.stop();
+    console.log(error);
+    //spinner.stop();
     console.error('Coinmon is not working now. Please try again later.'.red);
   });
 };
 
-if (program.interval !== null) {
+container.on('click', function (data) {
   coinmonStart();
-  setInterval(coinmonStart, program.interval);
-} else {
-  coinmonStart();
-}
+});
+
+screen.key(['escape', 'q', 'C-c'], function (ch, key) {
+  return process.exit(0);
+});
+coinmonStart();
