@@ -16,7 +16,6 @@ program
   .option('-f, --find [symbol]', 'Find specific coin data with coin symbol (can be a comma seperated list)', list, [])
   .option('-t, --top [index]', 'Show the top coins ranked from 1 - [index] according to the market cap', null)
   .option('-H, --humanize [enable]', 'Show market cap as a humanized number, default true', true)
-  .option('-i, --interval [milliseconds]', 'Show The Market Information continuously every [milliseconds].', null)
   .parse(process.argv);
 
 const convert = program.convert.toUpperCase()
