@@ -34,18 +34,6 @@ var screen = blessed.screen({
 });
 
 screen.title = 'Coinmon Cryptocurrency Tracker';
-var screen = blessed.screen({
-  smartCSR: true,
-  fullUnicode: true,
-  resizeTimeout: 300,
- dockBorders: true,
- cursor: {
-   artificial: true,
-   shape: 'line',
-   blink: true,
-   color: null
- },
-});
 
 const container = blessed.box({
   parent: screen,
