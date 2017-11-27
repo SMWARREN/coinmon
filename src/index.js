@@ -30,9 +30,9 @@ const humanizeIsEnabled = program.humanize !== 'false';
 var screen = blessed.screen({
   smartCSR: true,
   fullUnicode: true,
-});
+1});
 
-screen.title = 'Coinmon Cryptocurrency Tracker';
+screen.title = 'The Cryptocurrency Price Tool on CLI';
 
 const container = blessed.box({
   parent: screen,
@@ -41,7 +41,7 @@ const container = blessed.box({
   top: 'center',
   width: '100%',
   height: '100%',
-  content: '{center}Welcome to Coinmon: \n The Cryptocurrency Price Tool on CLI \n To Refresh Click on The Terminal, Scroll Use the Arrow Keys ↑↓,\n Quit on Escape, q, or Control-C.{/center}',
+  content: '{center}Welcome to Coinmon: \n The Cryptocurrency Price Tool on CLI \n To Refresh Click on The Terminal, To Scroll Use the Arrow Keys ↑↓,\n Quit on Escape, q, or Control-C.{/center}',
   tags: true,
   style: {
     fg: 'white',
@@ -80,25 +80,11 @@ const coinmonStart = () => {
       return [record.rank, `${record.symbol}`, record[`price_${convert}`.toLowerCase()], change24h, change1h, displayedMarketCap];
     }).forEach(record => tables.push(record));
 
-    const table = blessed.ListTable({
+    const table = blessed.table({
       parent: container,
-      border: "line",
       top: 4,
       tags: true,
       width: '98%',
-      height: '98%',
-      style: {
-        border: {
-          fg: "red"
-        },
-        header: {
-          fg: "yellow",
-          bold: true
-        },
-        cell: {
-          fg: "black"
-        }
-      }
     });
     if (table.length === 0) {
       console.log('We are not able to find coins matching your keywords'.red);
@@ -111,7 +97,6 @@ const coinmonStart = () => {
     }
   }).catch(function (error) {
     console.log(error);
-    //spinner.stop();
     console.error('Coinmon is not working now. Please try again later.'.red);
   });
 };
