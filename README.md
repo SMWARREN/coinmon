@@ -85,6 +85,40 @@ $ npm link
 $ coinmon
 ```
 
+## Docker
+
+### Initial usage
+
+```
+$ docker run --rm -ti jaymoulin/coinmon
+```
+
+You can pass parameters just like `coinmon` binary
+
+```
+$ docker run --rm -ti jaymoulin/coinmon --help
+```
+
+### Local usage
+
+#### Build image
+
+```
+$ docker build -t coinmon .
+```
+
+#### Usage
+
+```
+$ docker run --rm -ti coinmon
+```
+
+You can pass parameters just like `coinmon` binary
+
+```
+$ docker run --rm -ti coinmon --help
+```
+
 ## License
 
 MIT
