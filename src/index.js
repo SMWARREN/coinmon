@@ -7,7 +7,6 @@ const Table = require('cli-table2');
 const colors = require('colors');
 const humanize = require('humanize-plus');
 const blessed = require('blessed');
-
 const list = val => val.split(',')
 
 program
@@ -36,7 +35,6 @@ screen.title = 'The Cryptocurrency Price Tool on CLI';
 
 const container = blessed.box({
   parent: screen,
-  scrollable: true,
   left: 'center',
   top: 'center',
   width: '100%',
@@ -48,13 +46,6 @@ const container = blessed.box({
     bg: 'black'
   },
   border: 'line',
-  keys: true,
-  vi: true,
-  alwaysScroll: true,
-  scrollbar: {
-    ch: ' ',
-    inverse: true
-  }
 });
 
 const coinmonStart = () => {
@@ -80,17 +71,42 @@ const coinmonStart = () => {
       return [record.rank, `${record.symbol}`, record[`price_${convert}`.toLowerCase()], change24h, change1h, displayedMarketCap];
     }).forEach(record => tables.push(record));
 
-    const table = blessed.table({
+    const table = blessed.ListTable({
       parent: container,
-      top: 4,
+      top: 5,
+      left: 'center',
+      border: "line",
       tags: true,
       width: '98%',
+      height: '75%',
+      scrollable: true,
+      keys: true,
+      vi: true,
+      alwaysScroll: true,
+      scrollbar: {
+        ch: ' ',
+        inverse: true
+      },
+      style: {
+        border: {
+          fg: "red"
+        },
+        header: {
+          fg: "yellow",
+          bold: true
+        },
+        cell: {
+          fg: "black"
+        }
+      },
     });
     if (table.length === 0) {
       console.log('We are not able to find coins matching your keywords'.red);
     } else {
       table.setData(tables);
       container.append(table);
+      table.focus();
+
       console.log(`Data source from coinmarketcap.com at ${new Date().toLocaleTimeString()}`);
       screen.render();
 
