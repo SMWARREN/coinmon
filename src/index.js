@@ -30,7 +30,7 @@ const humanizeIsEnabled = program.humanize !== 'false';
 var screen = blessed.screen({
   smartCSR: true,
   fullUnicode: true,
-1});
+});
 
 screen.title = 'The Cryptocurrency Price Tool on CLI';
 
