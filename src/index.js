@@ -7,6 +7,7 @@ const Table = require('cli-table2');
 const colors = require('colors');
 const humanize = require('humanize-plus');
 const blessed = require('blessed');
+
 const list = val => val.split(',')
 
 program
@@ -48,6 +49,31 @@ const container = blessed.box({
   border: 'line',
 });
 
+
+// Create a box perfectly centered horizontally and vertically.
+var box = blessed.box({
+  top: 2,
+  left: 2,
+  width: 8,
+  height: 3,
+  content: 'MENU',
+  tags: true,
+  border: {
+    type: 'line'
+  },
+  style: {
+    fg: 'black',
+    bg: 'white',
+    border: {
+      fg: '#f0f0f0'
+    },
+    hover: {
+      bg: 'red'
+    }
+  }
+});
+
+screen.append(box);
 const coinmonStart = () => {
   const tables = [['Rank', 'Coin', `Price (${convert})`, 'Change (24H)', 'Change (1H)', `Market Cap (${convert})`]];
   const spinner = ora('Loading data').start();
@@ -119,6 +145,9 @@ const coinmonStart = () => {
 
 container.on('click', function (data) {
   coinmonStart();
+});
+box.on('click', function(data){
+  // HANDLE MENU FUNCTION
 });
 
 screen.key(['escape', 'q', 'C-c'], function (ch, key) {
